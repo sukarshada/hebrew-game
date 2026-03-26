@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>חבר חדש - משחקי אוצר מילים</title>
+  <style>
+    :root{
+      --bg:#f5f8fc;
+      --card:#ffffff;
+      --primary:#6fa8dc;
+      --primary-dark:#3d79b8;
+      --mint:#dff3ea;
+      --soft-blue:#eaf4ff;
+      --soft-yellow:#fff4cf;
+      --soft-pink:#fdecef;
+      --line:#d8e5f2;
+      --text:#243447;
+      --muted:#58708a;
+      --ok:#e8f8ea;
+      --ok-border:#79c683;
+      --bad:#ffeded;
+      --bad-border:#e48888;
+      --shadow:0 8px 24px rgba(66, 102, 145, 0.10);
+      --radius:24px;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,"Noto Sans Hebrew",sans-serif;
+      background:
+        radial-gradient(circle at top right, #eef7ff 0%, transparent 25%),
+        radial-gradient(circle at top left, #fef6fb 0%, transparent 20%),
+        linear-gradient(180deg, #f7fbff 0%, #f4f7fb 100%);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    .container{
+      max-width:1100px;
+      margin:0 auto;
+      padding:18px 12px 40px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,#ffffff,#f7fbff);
+      border:1px solid #edf4fb;
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:22px 18px 18px;
+      text-align:center;
+      margin-bottom:18px;
+    }
+
+    .hero h1{
+      margin:0 0 8px;
+      color:#20496e;
+      font-size:clamp(28px,4vw,44px);
+    }
+
+    .hero .subtitle{
+      margin:0 auto 10px;
+      max-width:850px;
+      line-height:1.8;
+      color:var(--muted);
+      font-size:1.05rem;
+    }
+
+    .maker{
+      display:inline-block;
+      background:var(--soft-blue);
+      color:var(--primary-dark);
+      border:1px solid #d2e7fb;
+      border-radius:999px;
+      padding:10px 16px;
+      font-weight:700;
+      margin-top:6px;
+    }
+
+    .chips{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      margin-top:16px;
+    }
+
+    .chip{
+      background:white;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:10px 14px;
+      font-weight:700;
+      color:#305577;
+      box-shadow:0 4px 12px rgba(69,112,158,.08);
+    }
+
+    .story-card{
+      background:var(--card);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      padding:18px;
+      border:1px solid #edf4fb;
+      margin-bottom:18px;
+    }
+
+    .section-title{
+      margin:0 0 12px;
+      color:#214a70;
+      font-size:1.35rem;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+
+    .section-title .icon{
+      width:38px;
+      height:38px;
+      border-radius:14px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      background:var(--soft-blue);
+      font-size:1.2rem;
+    }
+
+    .story{
+      background:linear-gradient(180deg,#fcfeff,#f8fbff);
+      border:1px solid var(--line);
+      border-radius:22px;
+      padding:16px;
+      line-height:2;
+      font-size:1.05rem;
+    }
+
+    .story strong{
+      background:var(--soft-yellow);
+      padding:2px 6px;
+      border-radius:8px;
+    }
+
+    .note{
+      margin-top:12px;
+      border-radius:18px;
+      background:var(--mint);
+      border:1px solid #c8ead8;
+      padding:12px 14px;
+      line-height:1.8;
+      color:#355a46;
+    }
+
+    .games-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(310px,1fr));
+      gap:18px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:28px;
+      box-shadow:var(--shadow);
+      border:1px solid #edf4fb;
+      padding:18px;
+    }
+
+    .hint{
+      background:#f8fbff;
+      border:1px dashed #d5e4f2;
+      color:var(--muted);
+      border-radius:18px;
+      padding:10px 12px;
+      line-height:1.8;
+      margin-bottom:12px;
+    }
+
+    .prompt{
+      background:#ffffff;
+      border:1px solid #edf3f8;
+      border-radius:18px;
+      padding:12px;
+      line-height:1.8;
+      margin-bottom:12px;
+    }
+
+    .options, .items{
+      display:grid;
+      gap:10px;
+    }
+
+    button, select{
+      font:inherit;
+    }
+
+    .option-btn, .classify-btn, .memory-card{
+      width:100%;
+      border:none;
+      border-radius:18px;
+      padding:13px 14px;
+      background:#fbfdff;
+      border:1px solid var(--line);
+      color:var(--text);
+      text-align:right;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease, background .15s ease;
+    }
+
+    .option-btn:hover, .classify-btn:hover, .memory-card:hover, .main-btn:hover{
+      transform:translateY(-1px);
+      box-shadow:0 8px 18px rgba(74,115,159,.10);
+    }
+
+    .correct{ background:var(--ok)!important; border:1px solid var(--ok-border)!important; }
+    .wrong{ background:var(--bad)!important; border:1px solid var(--bad-border)!important; }
+
+    .result{
+      margin-top:12px;
+      min-height:48px;
+      padding:12px 14px;
+      border-radius:18px;
+      background:#f8fbff;
+      border:1px solid #dbe8f4;
+      line-height:1.8;
+    }
+
+    .score{
+      display:inline-block;
+      margin-top:10px;
+      background:var(--soft-yellow);
+      border:1px solid #f1dfa2;
+      padding:8px 12px;
+      border-radius:999px;
+      font-weight:700;
+      color:#7a6230;
+    }
+
+    .sentence-box{
+      background:#fcfdff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+      line-height:1.9;
+      margin-bottom:10px;
+    }
+
+    select{
+      width:100%;
+      margin-top:10px;
+      border:1px solid #cfe0ef;
+      border-radius:14px;
+      padding:12px;
+      background:white;
+      color:var(--text);
+    }
+
+    .main-btn{
+      border:none;
+      border-radius:16px;
+      padding:12px 16px;
+      font-weight:700;
+      cursor:pointer;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .check-btn{
+      background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+      color:white;
+      width:100%;
+      margin-top:4px;
+    }
+
+    .restart-btn{
+      background:var(--soft-pink);
+      border:1px solid #f6d6de;
+      color:#8a4e60;
+      width:100%;
+      margin-top:10px;
+    }
+
+    .memory-grid{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .memory-card{
+      min-height:84px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      background:linear-gradient(180deg,#f7fbff,#eef6ff);
+      color:#35597a;
+      box-shadow:0 4px 12px rgba(83,125,170,.08);
+    }
+
+    .memory-card.flipped, .memory-card.matched{
+      background:white;
+    }
+
+    .memory-card.matched{
+      background:var(--ok);
+      border:1px solid var(--ok-border);
+    }
+
+    .classify-word{
+      text-align:center;
+      padding:16px 12px;
+      border-radius:20px;
+      background:linear-gradient(180deg,#f8fbff,#ffffff);
+      border:1px solid var(--line);
+      font-size:1.2rem;
+      font-weight:700;
+      color:#2e567a;
+      margin-bottom:12px;
+    }
+
+    .footer{
+      margin-top:18px;
+      text-align:center;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    @media (max-width:700px){
+      .memory-grid{ grid-template-columns:repeat(2,1fr); }
+      .container{ padding:14px 10px 32px; }
+      .card, .story-card, .hero{ border-radius:22px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <section class="hero">
+      <h1>חָבֵר חָדָשׁ – מִשְׂחֲקֵי אֹצַר מִלִּים</h1>
+      <div class="subtitle">
+        מַטָּרַת הַמִּשְׂחָקִים: <strong>הַרְחָבַת אוֹצַר מִלִּים</strong> בְּעִבְרִית לְתַלְמִידִים עַרְבִים,
+        בְּהִתְבַּסֵּס עַל הַסִּפּוּר <strong>"חָבֵר חָדָשׁ"</strong>.
+      </div>
+      <div class="maker">נַעֲשָׂה עַל יְדֵי חַנָּאן מוּעַד</div>
+
+      <div class="chips">
+        <span class="chip">גֶּשֶׁם</span>
+        <span class="chip">קַר</span>
+        <span class="chip">רָטוּב</span>
+        <span class="chip">לָקַח</span>
+        <span class="chip">תַּנּוּר</span>
+        <span class="chip">חָבֵר</span>
+      </div>
+    </section>
+
+    <section class="story-card">
+      <h2 class="section-title"><span class="icon">📖</span>הַסִּפּוּר</h2>
+      <div class="story">
+        בְּיוֹם חֹרֶף <strong>קַר</strong> אָמִיר חָזַר מִבֵּית הַסֵּפֶר. יָרַד <strong>גֶּשֶׁם</strong>, וְאָמִיר הָיָה קְצָת <strong>רָטוּב</strong>.<br>
+        פִּתְאֹם הוּא רָאָה חָתוּל קָטָן לְיַד הָעֵץ. הַחָתוּל רָעַד מִן הַקּוֹר.<br>
+        אָמִיר <strong>לָקַח</strong> אֶת הַחָתוּל לַבַּיִת. בַּבַּיִת הָיָה <strong>תַּנּוּר</strong> חַם.<br>
+        לְאַט־לְאַט הַחָתוּל הִתְחַמֵּם וְנִרְגַּע. בַּסּוֹף הוּא נִהְיָה <strong>חָבֵר</strong> חָדָשׁ שֶׁל אָמִיר.
+      </div>
+      <div class="note">
+        הַמִּשְׂחָקִים לְמַטָּה בְּנוּיִים עַל אוֹתָן מִלִּים מַפְתֵּחַ.
+      </div>
+    </section>
+
+    <section class="games-grid">
+      <section class="card">
+        <h2 class="section-title"><span class="icon">💡</span>מִשְׂחָק 1: זִהוּי מִלִּים</h2>
+        <div class="hint">בִּחֲרוּ אֶת הַמִּלָּה הַנְּכוֹנָה לְפִי הַפֵּרוּשׁ בַּעֲרָבִית.</div>
+        <div class="prompt" id="q1Prompt"></div>
+        <div class="options" id="q1Options"></div>
+        <div class="score" id="q1Score">נִקּוּד: 0 / 0</div>
+        <div class="result" id="q1Result">הַתַּרְגִּיל מַתְחִיל עַכְשָׁיו.</div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title"><span class="icon">✍️</span>מִשְׂחָק 2: הַשְׁלִימוּ מִשְׁפָּטִים</h2>
+        <div class="hint">בִּחֲרוּ אֶת הַמִּלָּה הַמַּתְאִימָה לַמָּקוֹם הָרֵיק.</div>
+        <div id="sentencesBox"></div>
+        <button class="main-btn check-btn" onclick="checkSentences()">בִּדְקוּ תְּשׁוּבוֹת</button>
+        <div class="result" id="sentencesResult"></div>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title"><span class="icon">🧠</span>מִשְׂחָק 3: זִכָּרוֹן</h2>
+        <div class="hint">מִצְאוּ זוּגוֹת: מִלָּה בְּעִבְרִית + פֵּרוּשׁ בַּעֲרָבִית.</div>
+        <div class="memory-grid" id="memoryGrid"></div>
+        <div class="result" id="memoryResult">מִצְאוּ אֶת כָּל הַזּוּגוֹת.</div>
+        <button class="main-btn restart-btn" onclick="startMemoryGame()">הַתְחָלָה מֵחָדָשׁ</button>
+      </section>
+
+      <section class="card">
+        <h2 class="section-title"><span class="icon">🔤</span>מִשְׂחָק 4: כִּשּׁוּרֵי לָשׁוֹן</h2>
+        <div class="hint">בִּחֲרוּ אִם הַמִּלָּה הִיא <strong>שֵׁם עֶצֶם</strong>, <strong>פֹּעַל</strong> אוֹ <strong>תֹּאַר</strong>.</div>
+        <div class="classify-word" id="classifyWord"></div>
+        <div class="items" id="classifyOptions"></div>
+        <div class="score" id="classifyScore">נִקּוּד: 0 / 0</div>
+        <div class="result" id="classifyResult">בִּחֲרוּ אֶת הַתְּשׁוּבָה הַנְּכוֹנָה.</div>
+      </section>
+    </section>
+
+    <div class="footer">בְּהַצְלָחָה!</div>
+  </div>
+
+  <script>
+    const recognitionQuestions = [
+      { ar: "مطر", answer: "גֶּשֶׁם", options: ["גֶּשֶׁם","חָבֵר","תַּנּוּר"] },
+      { ar: "بارد", answer: "קַר", options: ["רָטוּב","קַר","לָקַח"] },
+      { ar: "مبلّل", answer: "רָטוּב", options: ["חָבֵר","רָטוּב","גֶּשֶׁם"] },
+      { ar: "أخذ", answer: "לָקַח", options: ["תַּנּוּר","לָקַח","קַר"] },
+      { ar: "مدفأة / تنور", answer: "תַּנּוּר", options: ["רָטוּב","תַּנּוּר","חָבֵר"] },
+      { ar: "صديق", answer: "חָבֵר", options: ["לָקַח","חָבֵר","גֶּשֶׁם"] }
+    ];
+    let rqIndex = 0;
+    let rqCorrect = 0;
+
+    function renderRecognitionQuestion(){
+      const q = recognitionQuestions[rqIndex];
+      document.getElementById("q1Prompt").innerHTML = `פֵּרוּשׁ בַּעֲרָבִית: <strong>${q.ar}</strong>`;
+      const box = document.getElementById("q1Options");
+      box.innerHTML = "";
+      q.options.forEach(opt => {
+        const btn = document.createElement("button");
+        btn.className = "option-btn";
+        btn.textContent = opt;
+        btn.onclick = () => handleRecognitionAnswer(opt, q.answer);
+        box.appendChild(btn);
+      });
+      document.getElementById("q1Score").textContent = `נִקּוּד: ${rqCorrect} / ${rqIndex}`;
+    }
+
+    function handleRecognitionAnswer(choice, answer){
+      const buttons = [...document.querySelectorAll("#q1Options .option-btn")];
+      buttons.forEach(btn=>{
+        btn.disabled = true;
+        if(btn.textContent === answer) btn.classList.add("correct");
+        else if(btn.textContent === choice) btn.classList.add("wrong");
+      });
+
+      document.getElementById("q1Result").innerHTML =
+        choice === answer
+          ? `יָפֶה! הַתְּשׁוּבָה הַנְּכוֹנָה: <strong>${answer}</strong>`
+          : `כִּמְעַט. הַתְּשׁוּבָה הַנְּכוֹנָה: <strong>${answer}</strong>`;
+
+      if(choice === answer) rqCorrect++;
+      rqIndex++;
+      document.getElementById("q1Score").textContent = `נִקּוּד: ${rqCorrect} / ${rqIndex}`;
+
+      setTimeout(()=>{
+        if(rqIndex < recognitionQuestions.length){
+          renderRecognitionQuestion();
+        } else {
+          document.getElementById("q1Prompt").innerHTML = "<strong>סִיַּמְתֶּם אֶת הַתַּרְגִּיל!</strong>";
+          document.getElementById("q1Options").innerHTML = "";
+          document.getElementById("q1Result").innerHTML = `תּוֹצָאָה סוֹפִית: <strong>${rqCorrect} מִתּוֹךְ ${recognitionQuestions.length}</strong>`;
+        }
+      }, 900);
+    }
+
+    const sentenceItems = [
+      { text: "בַּחוּץ יָרַד ___ .", options: ["תַּנּוּר","גֶּשֶׁם","חָבֵר"], answer: "גֶּשֶׁם" },
+      { text: "הַיּוֹם הָיָה יוֹם חֹרֶף ___ .", options: ["קַר","רָטוּב","לָקַח"], answer: "קַר" },
+      { text: "אָמִיר הָיָה קְצָת ___ כִּי יָרַד גֶּשֶׁם.", options: ["חָבֵר","רָטוּב","תַּנּוּר"], answer: "רָטוּב" },
+      { text: "אָמִיר ___ אֶת הַחָתוּל לַבַּיִת.", options: ["לָקַח","קַר","גֶּשֶׁם"], answer: "לָקַח" },
+      { text: "בַּבַּיִת הָיָה ___ חַם.", options: ["רָטוּב","חָבֵר","תַּנּוּר"], answer: "תַּנּוּר" },
+      { text: "בַּסּוֹף הַחָתוּל נִהְיָה ___ שֶׁל אָמִיר.", options: ["חָבֵר","קַר","לָקַח"], answer: "חָבֵר" }
+    ];
+
+    function renderSentenceGame(){
+      const box = document.getElementById("sentencesBox");
+      box.innerHTML = "";
+      sentenceItems.forEach((item, index)=>{
+        const row = document.createElement("div");
+        row.className = "sentence-box";
+        row.innerHTML = `
+          <div><strong>${index+1}.</strong> ${item.text}</div>
+          <select id="sentenceSelect${index}">
+            <option value="">בִּחֲרוּ מִלָּה</option>
+            ${item.options.map(opt => `<option value="${opt}">${opt}</option>`).join("")}
+          </select>
+        `;
+        box.appendChild(row);
+      });
+    }
+
+    function checkSentences(){
+      let correct = 0;
+      let feedback = "";
+      sentenceItems.forEach((item, index)=>{
+        const value = document.getElementById(`sentenceSelect${index}`).value;
+        if(value === item.answer){
+          correct++;
+          feedback += `סָעִיף ${index+1}: נָכוֹן ✓<br>`;
+        } else {
+          feedback += `סָעִיף ${index+1}: הַתְּשׁוּבָה הַנְּכוֹנָה הִיא <strong>${item.answer}</strong><br>`;
+        }
+      });
+      document.getElementById("sentencesResult").innerHTML = `קִבַּלְתֶּם <strong>${correct} / ${sentenceItems.length}</strong><br>${feedback}`;
+    }
+
+    const memoryPairs = [
+      ["גֶּשֶׁם","مطر"],
+      ["קַר","بارد"],
+      ["רָטוּב","مبلّل"],
+      ["לָקַח","أخذ"],
+      ["תַּנּוּר","مدفأة / تنور"],
+      ["חָבֵר","صديق"]
+    ];
+
+    let flippedCards = [];
+    let matchedCount = 0;
+    let lockBoard = false;
+
+    function shuffle(arr){
+      const a = [...arr];
+      for(let i=a.length-1;i>0;i--){
+        const j = Math.floor(Math.random()*(i+1));
+        [a[i], a[j]] = [a[j], a[i]];
+      }
+      return a;
+    }
+
+    function startMemoryGame(){
+      const cards = [];
+      memoryPairs.forEach((pair, idx)=>{
+        cards.push({pairId: idx, text: pair[0], side: "he"});
+        cards.push({pairId: idx, text: pair[1], side: "ar"});
+      });
+
+      const grid = document.getElementById("memoryGrid");
+      grid.innerHTML = "";
+      flippedCards = [];
+      matchedCount = 0;
+      lockBoard = false;
+
+      shuffle(cards).forEach(cardData=>{
+        const btn = document.createElement("button");
+        btn.className = "memory-card";
+        btn.textContent = "?";
+        btn.dataset.pairId = cardData.pairId;
+        btn.dataset.text = cardData.text;
+        btn.dataset.side = cardData.side;
+        btn.dataset.open = "false";
+        btn.onclick = ()=>flipCard(btn);
+        grid.appendChild(btn);
+      });
+
+      document.getElementById("memoryResult").innerHTML = "מִצְאוּ אֶת כָּל הַזּוּגוֹת.";
+    }
+
+    function flipCard(card){
+      if(lockBoard || card.classList.contains("matched") || card.dataset.open === "true") return;
+
+      card.dataset.open = "true";
+      card.classList.add("flipped");
+      card.textContent = card.dataset.text;
+      flippedCards.push(card);
+
+      if(flippedCards.length === 2){
+        lockBoard = true;
+        const [c1, c2] = flippedCards;
+        const isPair = c1.dataset.pairId === c2.dataset.pairId && c1.dataset.side !== c2.dataset.side;
+
+        if(isPair){
+          c1.classList.add("matched");
+          c2.classList.add("matched");
+          matchedCount++;
+          document.getElementById("memoryResult").innerHTML = "מְעוּלֶּה! מְצָאתֶם זוּג.";
+          flippedCards = [];
+          lockBoard = false;
+
+          if(matchedCount === memoryPairs.length){
+            document.getElementById("memoryResult").innerHTML = "כָּל הַכָּבוֹד! מְצָאתֶם אֶת כָּל הַזּוּגוֹת!";
+          }
+        } else {
+          document.getElementById("memoryResult").innerHTML = "לֹא זוּג. נַסּוּ שׁוּב.";
+          setTimeout(()=>{
+            flippedCards.forEach(c=>{
+              c.dataset.open = "false";
+              c.classList.remove("flipped");
+              c.textContent = "?";
+            });
+            flippedCards = [];
+            lockBoard = false;
+          }, 850);
+        }
+      }
+    }
+
+    const classifyQuestions = [
+      { word: "גֶּשֶׁם", answer: "שֵׁם עֶצֶם", options: ["שֵׁם עֶצֶם","פֹּעַל","תֹּאַר"] },
+      { word: "קַר", answer: "תֹּאַר", options: ["תֹּאַר","שֵׁם עֶצֶם","פֹּעַל"] },
+      { word: "רָטוּב", answer: "תֹּאַר", options: ["פֹּעַל","תֹּאַר","שֵׁם עֶצֶם"] },
+      { word: "לָקַח", answer: "פֹּעַל", options: ["שֵׁם עֶצֶם","פֹּעַל","תֹּאַר"] },
+      { word: "תַּנּוּר", answer: "שֵׁם עֶצֶם", options: ["תֹּאַר","שֵׁם עֶצֶם","פֹּעַל"] },
+      { word: "חָבֵר", answer: "שֵׁם עֶצֶם", options: ["פֹּעַל","תֹּאַר","שֵׁם עֶצֶם"] }
+    ];
+    let cIndex = 0;
+    let cCorrect = 0;
+
+    function renderClassifyQuestion(){
+      const q = classifyQuestions[cIndex];
+      document.getElementById("classifyWord").textContent = q.word;
+      const box = document.getElementById("classifyOptions");
+      box.innerHTML = "";
+      q.options.forEach(opt=>{
+        const btn = document.createElement("button");
+        btn.className = "classify-btn";
+        btn.textContent = opt;
+        btn.onclick = ()=>handleClassify(opt, q.answer);
+        box.appendChild(btn);
+      });
+      document.getElementById("classifyScore").textContent = `נִקּוּד: ${cCorrect} / ${cIndex}`;
+    }
+
+    function handleClassify(choice, answer){
+      const buttons = [...document.querySelectorAll("#classifyOptions .classify-btn")];
+      buttons.forEach(btn=>{
+        btn.disabled = true;
+        if(btn.textContent === answer) btn.classList.add("correct");
+        else if(btn.textContent === choice) btn.classList.add("wrong");
+      });
+
+      document.getElementById("classifyResult").innerHTML =
+        choice === answer
+          ? `נָכוֹן! <strong>${answer}</strong>`
+          : `כִּמְעַט. הַתְּשׁוּבָה הַנְּכוֹנָה: <strong>${answer}</strong>`;
+
+      if(choice === answer) cCorrect++;
+      cIndex++;
+      document.getElementById("classifyScore").textContent = `נִקּוּד: ${cCorrect} / ${cIndex}`;
+
+      setTimeout(()=>{
+        if(cIndex < classifyQuestions.length){
+          renderClassifyQuestion();
+        } else {
+          document.getElementById("classifyWord").innerHTML = "סִיַּמְתֶּם!";
+          document.getElementById("classifyOptions").innerHTML = "";
+          document.getElementById("classifyResult").innerHTML = `תּוֹצָאָה סוֹפִית: <strong>${cCorrect} מִתּוֹךְ ${classifyQuestions.length}</strong>`;
+        }
+      }, 900);
+    }
+
+    renderRecognitionQuestion();
+    renderSentenceGame();
+    startMemoryGame();
+    renderClassifyQuestion();
+  </script>
+</body>
+</html>
